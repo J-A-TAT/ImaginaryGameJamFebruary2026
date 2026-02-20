@@ -1,0 +1,3 @@
+We can use this new folder type to store notes, including credits
+to-do lists and narrative from the GDD for pickups. 
+----------------------------------------------------------------------------

@@ -1,0 +1,7 @@
+Please use this 32-Bit colour pallete when setting colours in a scene. 
+This is part of an experiment to limit colour variation.
+----------------------------------------------------------------------------
+I have created a colour pallete scene you can drag and drop into the scene 
+you're making and then use the eyedropper tool to select one of the 
+colours on the pallete.
+----------------------------------------------------------------------------
