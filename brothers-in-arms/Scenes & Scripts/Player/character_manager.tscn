@@ -1,0 +1,41 @@
+[gd_scene load_steps=4 format=3 uid="uid://clj5cr27uhuck"]
+
+[ext_resource type="PackedScene" uid="uid://giax34qinv16" path="res://Scenes & Scripts/Player/player1.tscn" id="1_b2bso"]
+[ext_resource type="Script" uid="uid://dbx08l1hrypc1" path="res://Scenes & Scripts/Player/character_manager.gd" id="1_cb3pd"]
+[ext_resource type="PackedScene" uid="uid://cpu4tlsx84nis" path="res://Scenes & Scripts/Player/player2.tscn" id="2_cb3pd"]
+
+[node name="CharacterManager" type="Node2D"]
+script = ExtResource("1_cb3pd")
+max_travel_distance = 120.0
+rope_damping = 20.0
+perpendicular_damping = 0.2
+rope_midair_fall_threshold = 120.0
+swing_apex_free_time = 2.0
+swing_apex_jump_velocity = -700.0
+rope_climb_enabled = false
+rope_climb_limit = 50.0
+
+[node name="Player1" parent="." instance=ExtResource("1_b2bso")]
+position = Vector2(20, 0)
+
+[node name="P1MindistanceMarker2D" type="Marker2D" parent="Player1"]
+position = Vector2(1, 0)
+
+[node name="RopeSwingCenterP1Marker2D" type="Marker2D" parent="Player1"]
+position = Vector2(1, 113)
+
+[node name="Player2" parent="." instance=ExtResource("2_cb3pd")]
+z_index = 3
+position = Vector2(-24, 0)
+
+[node name="P2MindistanceMarker2D" type="Marker2D" parent="Player2"]
+
+[node name="RopeSwingCenterP2Marker2D" type="Marker2D" parent="Player2"]
+position = Vector2(1, 113)
+
+[node name="Gameplay" type="Node2D" parent="."]
+
+[node name="MainCamera2D" type="Camera2D" parent="Gameplay"]
+zoom = Vector2(2, 2)
+
+[node name="Line2D" type="Line2D" parent="Gameplay"]
