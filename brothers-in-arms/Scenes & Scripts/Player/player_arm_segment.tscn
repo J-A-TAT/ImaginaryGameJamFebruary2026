@@ -1,0 +1,20 @@
+[gd_scene load_steps=3 format=3 uid="uid://c7bfbk8tf57p"]
+
+[ext_resource type="Texture2D" uid="uid://cn7oyjas1hylu" path="res://Assets/Artwork/DevArt/Environment_0005_PlatformRounded.png" id="1_2jmo7"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_2jmo7"]
+radius = 4.0
+height = 32.0
+
+[node name="PlayerArmSegment" type="RigidBody2D"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+z_index = 1
+shape = SubResource("CapsuleShape2D_2jmo7")
+
+[node name="Artwork" type="Node2D" parent="."]
+
+[node name="Sprite2D" type="Sprite2D" parent="Artwork"]
+rotation = 1.5707964
+scale = Vector2(0.25, 0.25)
+texture = ExtResource("1_2jmo7")

@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://c6gg38kc1lp7w"]
+
+[ext_resource type="Texture2D" uid="uid://dui27hgoqshbr" path="res://Assets/Artwork/DevArt/Environment_0009_Square.png" id="1_h2bkg"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_fqmgb"]
+size = Vector2(128, 128)
+
+[node name="Ground" type="StaticBody2D"]
+collision_layer = 4
+collision_mask = 0
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_h2bkg")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+visible = false
+shape = SubResource("RectangleShape2D_fqmgb")
