@@ -9,6 +9,7 @@ height = 60.0
 
 [node name="Player1" type="CharacterBody2D"]
 collision_mask = 252
+safe_margin = 1.0
 script = ExtResource("1_v7ndh")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
@@ -53,3 +54,6 @@ one_shot = true
 [node name="AreaDetection" type="Node2D" parent="Gameplay/PhysicsDetection"]
 
 [node name="RaycastDetection" type="Node2D" parent="Gameplay/PhysicsDetection"]
+
+[node name="ShoulderMarker2D" type="Marker2D" parent="Gameplay"]
+position = Vector2(1, -9)

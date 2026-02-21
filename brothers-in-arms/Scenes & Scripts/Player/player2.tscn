@@ -49,3 +49,6 @@ texture = ExtResource("1_fxpub")
 [node name="AreaDetection" type="Node2D" parent="Gameplay/PhysicsDetection"]
 
 [node name="RaycastDetection" type="Node2D" parent="Gameplay/PhysicsDetection"]
+
+[node name="ShoulderMarker2D" type="Marker2D" parent="Gameplay"]
+position = Vector2(1, -9)

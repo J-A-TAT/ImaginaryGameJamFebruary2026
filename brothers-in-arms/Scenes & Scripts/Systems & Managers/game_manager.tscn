@@ -1,10 +1,9 @@
-[gd_scene load_steps=6 format=3 uid="uid://dvo1e77gr8k3"]
+[gd_scene load_steps=5 format=3 uid="uid://dvo1e77gr8k3"]
 
 [ext_resource type="PackedScene" uid="uid://i4j7g6habyp0" path="res://Colour Pallete/colour_pallete.tscn" id="1_avxtu"]
 [ext_resource type="PackedScene" uid="uid://c6gg38kc1lp7w" path="res://Scenes & Scripts/Environment/ground.tscn" id="1_jnjht"]
-[ext_resource type="PackedScene" uid="uid://giax34qinv16" path="res://Scenes & Scripts/Player/player1.tscn" id="2_v6nlk"]
-[ext_resource type="PackedScene" uid="uid://cpu4tlsx84nis" path="res://Scenes & Scripts/Player/player2.tscn" id="3_8b7eh"]
-[ext_resource type="PackedScene" uid="uid://nvpenbawj2jq" path="res://Scenes & Scripts/Environment/platform.tscn" id="5_8b7eh"]
+[ext_resource type="PackedScene" uid="uid://clj5cr27uhuck" path="res://Scenes & Scripts/Player/character_manager.tscn" id="1_v6nlk"]
+[ext_resource type="PackedScene" uid="uid://cnvy3d23oj2u8" path="res://Scenes & Scripts/Environment/swinging_platform.tscn" id="5_8b7eh"]
 
 [node name="game_manager" type="Node2D"]
 
@@ -13,12 +12,13 @@
 [node name="Gameplay" type="Node2D" parent="Game"]
 position = Vector2(640, 360)
 
+[node name="CharacterManager" parent="Game/Gameplay" instance=ExtResource("1_v6nlk")]
+position = Vector2(0, 240)
+
 [node name="Markers" type="Node2D" parent="Game/Gameplay"]
 position = Vector2(-640, -360)
 
 [node name="Camera" type="Node2D" parent="Game/Gameplay"]
-
-[node name="PlayerTrackingCamera2D" type="Camera2D" parent="Game/Gameplay/Camera"]
 
 [node name="Timers" type="Node2D" parent="Game/Gameplay"]
 
@@ -26,14 +26,6 @@ position = Vector2(-640, -360)
 
 [node name="ColourPallete" parent="Game/Gameplay" instance=ExtResource("1_avxtu")]
 position = Vector2(-888, -360)
-
-[node name="Players (Temp)" type="Node2D" parent="Game/Gameplay"]
-
-[node name="Player1" parent="Game/Gameplay/Players (Temp)" instance=ExtResource("2_v6nlk")]
-position = Vector2(48, 248)
-
-[node name="Player2" parent="Game/Gameplay/Players (Temp)" instance=ExtResource("3_8b7eh")]
-position = Vector2(-24, 248)
 
 [node name="Level" type="Node2D" parent="Game"]
 position = Vector2(640, 360)
@@ -48,6 +40,17 @@ scale = Vector2(16, 1)
 [node name="Ground2" parent="Game/Level/Floor1" instance=ExtResource("1_jnjht")]
 modulate = Color(0.57254905, 0.4392157, 0.24313726, 1)
 position = Vector2(648, -184)
+scale = Vector2(8, 0.2)
+
+[node name="Ground5" parent="Game/Level/Floor1" instance=ExtResource("1_jnjht")]
+modulate = Color(0.57254905, 0.4392157, 0.24313726, 1)
+position = Vector2(176, -208)
+scale = Vector2(0.23999023, 0.2)
+
+[node name="Ground4" parent="Game/Level/Floor1" instance=ExtResource("1_jnjht")]
+modulate = Color(0.57254905, 0.4392157, 0.24313726, 1)
+position = Vector2(8, -956)
+rotation = 1.5707964
 scale = Vector2(8, 0.5)
 
 [node name="Ground3" parent="Game/Level/Floor1" instance=ExtResource("1_jnjht")]
@@ -55,15 +58,5 @@ modulate = Color(0.57254905, 0.4392157, 0.24313726, 1)
 position = Vector2(-704, -328)
 scale = Vector2(8, 0.5)
 
-[node name="Ground4" parent="Game/Level/Floor1" instance=ExtResource("1_jnjht")]
-modulate = Color(0.57254905, 0.4392157, 0.24313726, 1)
-position = Vector2(-280, -472)
-scale = Vector2(8, 0.5)
-
-[node name="platform" parent="Game/Level/Floor1" instance=ExtResource("5_8b7eh")]
-modulate = Color(1, 0.5882353, 0.105882354, 1)
-position = Vector2(-32, -184)
-
-[node name="platform2" parent="Game/Level/Floor1" instance=ExtResource("5_8b7eh")]
-modulate = Color(1, 0.5882353, 0.105882354, 1)
-position = Vector2(-32, -296)
+[node name="Swinging_Platform" parent="." instance=ExtResource("5_8b7eh")]
+position = Vector2(649, 248)

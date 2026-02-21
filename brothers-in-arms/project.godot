@@ -11,6 +11,7 @@ config_version=5
 [application]
 
 config/name="Brothers In Arms"
+run/main_scene="uid://dvo1e77gr8k3"
 config/features=PackedStringArray("4.5", "GL Compatibility")
 boot_splash/bg_color=Color(0, 0, 0, 1)
 
@@ -20,6 +21,7 @@ window/size/viewport_width=1280
 window/size/viewport_height=720
 window/stretch/mode="viewport"
 window/stretch/scale_mode="integer"
+window/vsync/vsync_mode=0
 
 [file_customization]
 
@@ -31,6 +33,13 @@ folder_colors={
 "res://Scenes & Scripts/": "green",
 "res://Text & Notes/": "purple"
 }
+
+[gui]
+
+theme/stretch/scale=1.0
+theme/vsync/vsync_mode=1
+theme/stretch/mode="viewport"
+theme/layer_4="Wall"
 
 [input]
 
@@ -106,8 +115,7 @@ both_right={
 2d_physics/layer_1="Player"
 2d_physics/layer_2="PlayerArm"
 2d_physics/layer_3="Ground"
-2d_physics/layer_4="Wall"
-2d_physics/layer_5="Roof"
+2d_physics/layer_5="Platform"
 2d_physics/layer_6="Collectible"
 2d_physics/layer_7="Hazard"
 2d_physics/layer_8="Door"
