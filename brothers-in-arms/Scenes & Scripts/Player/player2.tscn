@@ -1,0 +1,51 @@
+[gd_scene load_steps=4 format=3 uid="uid://cpu4tlsx84nis"]
+
+[ext_resource type="Texture2D" uid="uid://db0d4hnhh4iqj" path="res://Assets/Artwork/DevArt/Player.png" id="1_fxpub"]
+[ext_resource type="Script" uid="uid://70ki6j7vk6m2" path="res://Scenes & Scripts/Player/player_2.gd" id="1_wvnul"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_1sm6r"]
+radius = 3.0
+height = 60.0
+
+[node name="Player2" type="CharacterBody2D"]
+collision_mask = 252
+script = ExtResource("1_wvnul")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+z_index = 1
+position = Vector2(1, 2)
+shape = SubResource("CapsuleShape2D_1sm6r")
+
+[node name="Artwork" type="Node2D" parent="."]
+
+[node name="Sprites" type="Node2D" parent="Artwork"]
+modulate = Color(1, 0, 0, 1)
+
+[node name="Sprite2D" type="Sprite2D" parent="Artwork/Sprites"]
+texture = ExtResource("1_fxpub")
+
+[node name="Sound" type="Node2D" parent="."]
+
+[node name="Jump" type="Node2D" parent="Sound"]
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="Sound/Jump"]
+
+[node name="Hurt" type="Node2D" parent="Sound"]
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="Sound/Hurt"]
+
+[node name="Bounce" type="Node2D" parent="Sound"]
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="Sound/Bounce"]
+
+[node name="Gameplay" type="Node2D" parent="."]
+
+[node name="Animations" type="Node2D" parent="Gameplay"]
+
+[node name="Timers" type="Node2D" parent="Gameplay"]
+
+[node name="PhysicsDetection" type="Node2D" parent="Gameplay"]
+
+[node name="AreaDetection" type="Node2D" parent="Gameplay/PhysicsDetection"]
+
+[node name="RaycastDetection" type="Node2D" parent="Gameplay/PhysicsDetection"]
