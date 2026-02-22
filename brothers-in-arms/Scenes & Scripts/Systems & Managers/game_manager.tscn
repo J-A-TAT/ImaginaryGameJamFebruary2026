@@ -1,9 +1,12 @@
-[gd_scene load_steps=5 format=3 uid="uid://dvo1e77gr8k3"]
+[gd_scene load_steps=8 format=3 uid="uid://dvo1e77gr8k3"]
 
 [ext_resource type="PackedScene" uid="uid://i4j7g6habyp0" path="res://Colour Pallete/colour_pallete.tscn" id="1_avxtu"]
 [ext_resource type="PackedScene" uid="uid://c6gg38kc1lp7w" path="res://Scenes & Scripts/Environment/ground.tscn" id="1_jnjht"]
 [ext_resource type="PackedScene" uid="uid://clj5cr27uhuck" path="res://Scenes & Scripts/Player/character_manager.tscn" id="1_v6nlk"]
+[ext_resource type="PackedScene" uid="uid://bx87c3opkpe5i" path="res://Scenes & Scripts/hazards/hazard.tscn" id="3_8b7eh"]
+[ext_resource type="PackedScene" uid="uid://shl5vrmfjipi" path="res://Scenes & Scripts/KeyDoor/key.tscn" id="4_ao8b3"]
 [ext_resource type="PackedScene" uid="uid://cnvy3d23oj2u8" path="res://Scenes & Scripts/Environment/swinging_platform.tscn" id="5_8b7eh"]
+[ext_resource type="PackedScene" uid="uid://byi5opx138wkw" path="res://Scenes & Scripts/KeyDoor/door.tscn" id="5_k8dbw"]
 
 [node name="game_manager" type="Node2D"]
 
@@ -26,6 +29,15 @@ position = Vector2(-640, -360)
 
 [node name="ColourPallete" parent="Game/Gameplay" instance=ExtResource("1_avxtu")]
 position = Vector2(-888, -360)
+
+[node name="Hazard" parent="Game/Gameplay" instance=ExtResource("3_8b7eh")]
+position = Vector2(238, 44)
+
+[node name="Key" parent="Game/Gameplay" instance=ExtResource("4_ao8b3")]
+position = Vector2(108, 145)
+
+[node name="Door" parent="Game/Gameplay" instance=ExtResource("5_k8dbw")]
+position = Vector2(287, 263)
 
 [node name="Level" type="Node2D" parent="Game"]
 position = Vector2(640, 360)
