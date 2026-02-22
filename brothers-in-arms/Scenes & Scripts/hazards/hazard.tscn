@@ -1,0 +1,30 @@
+[gd_scene load_steps=5 format=3 uid="uid://bx87c3opkpe5i"]
+
+[ext_resource type="Script" uid="uid://br20py4844y28" path="res://Scenes & Scripts/hazards/basic_hazard.gd" id="1_5dqtg"]
+[ext_resource type="Texture2D" uid="uid://elatv6kbr688" path="res://Assets/Artwork/DevArt/Environment_0003_Circle.png" id="1_grht4"]
+[ext_resource type="Texture2D" uid="uid://bkrqsq0k1noph" path="res://Assets/Artwork/TATExtra/BorrowedTimeUI_0004s_0001_NecroBeamUI.png" id="2_7klca"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_hwt6n"]
+radius = 30.0
+
+[node name="Hazard" type="StaticBody2D"]
+collision_layer = 64
+script = ExtResource("1_5dqtg")
+
+[node name="Artwork" type="Node2D" parent="."]
+
+[node name="Sprite2D" type="Sprite2D" parent="Artwork"]
+modulate = Color(13.96213, 0, 0, 1)
+texture = ExtResource("1_grht4")
+
+[node name="Sprite2D2" type="Sprite2D" parent="Artwork"]
+modulate = Color(0.75686276, 0, 0, 1)
+z_index = 1
+texture = ExtResource("2_7klca")
+
+[node name="Sound" type="Node2D" parent="."]
+
+[node name="Gameplay" type="Node2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_hwt6n")

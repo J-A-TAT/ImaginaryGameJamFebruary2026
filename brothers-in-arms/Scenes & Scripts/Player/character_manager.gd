@@ -13,7 +13,6 @@ class_name CharacterManager
 @onready var main_camera_2d: Camera2D = $Gameplay/MainCamera2D
 
 # PLAYER ROPE (VISUAL) - this is now your "debug" and your stylised rope.
-# Style it in the inspector: Gradient / Width Curve / Texture / Joint Mode / Cap Mode, etc.
 @onready var line_2d: Line2D = $Gameplay/Line2D
 
 # APEX (TIMERED)
@@ -89,12 +88,8 @@ class_name CharacterManager
 @export var apex_min_angle_from_vertical_deg: float = 25.0
 
 @export_group("Swing - Apex Timer Hold (INPUT LOCK)")
-## If true, while apex timer is running we ignore player input completely (pump/climb/velocity.x influence).
-## Rope still falls naturally because pendulum gravity continues.
 @export var disable_input_while_apex_timer_active: bool = true
-## Scale swing gravity/return-help while apex timer is active so the bob falls more like "no-input".
 @export var apex_timer_swing_gravity_scale: float = 0.35
-## Disable return-help while apex timer is active to prevent extra "snap" downward.
 @export var apex_timer_disable_return_help: bool = true
 
 @export_group("Swing - Apex Jump Height Clamp (PLAN B)")
@@ -103,8 +98,6 @@ class_name CharacterManager
 @export var apex_jump_clamp_duration: float = 0.35
 
 @export_group("Rope - Apex Jump Tug Advantage (NEW)")
-## When an apex jump fires, that player "wins" tug-of-war until they are grounded again.
-## 1.0 = full win (other player takes 100% of correction), 0.0 = no advantage.
 @export_range(0.0, 1.0, 0.01) var apex_tug_win_strength: float = 1.0
 
 @export_group("Rope - Climb")
@@ -116,8 +109,11 @@ class_name CharacterManager
 @export var rope_climb_jump_cooldown: float = 0.15
 
 @export_group("Rope - Visual")
-## This replaces the debug line. Style the Line2D itself in the inspector (gradient/width curve/texture/etc).
 @export var rope_line_enabled: bool = true
+
+@export_group("Knockback - Shared (NEW)")
+@export var shared_knockback_enabled: bool = true
+@export_range(0.0, 1.0, 0.05) var shared_knockback_ratio: float = 0.5
 
 #-----------
 # RUNTIME STATE
@@ -168,18 +164,20 @@ func _ready() -> void:
 	main_camera_2d.make_current()
 	process_priority = 1000
 
-	# Rope visuals are controlled by the Line2D inspector now (gradient/texture/width curve, etc.)
 	line_2d.visible = rope_line_enabled
 
 	_rope_current_length = max_travel_distance
 	_rope_base_length = max_travel_distance
 
+	# Wire apex timer
 	if apex_timer != null:
 		apex_timer.one_shot = true
 		if not apex_timer.timeout.is_connected(_on_apex_timer_timeout):
 			apex_timer.timeout.connect(_on_apex_timer_timeout)
 	else:
 		push_warning("%s: ApexTimer node is missing at $Gameplay/ApexTimer" % name)
+
+	_wire_knockback_sharing()
 
 
 func _physics_process(delta: float) -> void:
@@ -194,7 +192,6 @@ func _physics_process(delta: float) -> void:
 	if _apex_lock_timer > 0.0:
 		_apex_lock_timer = maxf(_apex_lock_timer - delta, 0.0)
 
-	# End tug advantage when the apex-jumper is grounded again
 	_update_apex_tug_advantage_end()
 
 	_update_players_distance()
@@ -217,6 +214,62 @@ func _physics_process(delta: float) -> void:
 
 
 #-----------
+# KNOCKBACK SHARING
+#-----------
+func _wire_knockback_sharing() -> void:
+	if player_1 != null and player_1.has_signal("knockback_happened"):
+		if not player_1.knockback_happened.is_connected(_on_player_1_knockback_happened):
+			player_1.knockback_happened.connect(_on_player_1_knockback_happened)
+
+	if player_2 != null and player_2.has_signal("knockback_happened"):
+		if not player_2.knockback_happened.is_connected(_on_player_2_knockback_happened):
+			player_2.knockback_happened.connect(_on_player_2_knockback_happened)
+
+
+func report_knockback(bob_is_p1: bool, knockback_velocity: Vector2) -> void:
+	if not shared_knockback_enabled:
+		return
+	_apply_shared_knockback(bob_is_p1, knockback_velocity)
+
+
+func _on_player_1_knockback_happened(knockback_velocity: Vector2) -> void:
+	if not shared_knockback_enabled:
+		return
+	_apply_shared_knockback(true, knockback_velocity)
+
+
+func _on_player_2_knockback_happened(knockback_velocity: Vector2) -> void:
+	if not shared_knockback_enabled:
+		return
+	_apply_shared_knockback(false, knockback_velocity)
+
+
+func _apply_shared_knockback(from_p1: bool, knockback_velocity: Vector2) -> void:
+	if knockback_velocity == Vector2.ZERO:
+		return
+
+	var other: CharacterBody2D = null
+	if from_p1:
+		other = player_2
+	else:
+		other = player_1
+
+	if other == null:
+		return
+
+	var ratio: float = clampf(shared_knockback_ratio, 0.0, 1.0)
+	var shared: Vector2 = knockback_velocity * ratio
+
+	# Preferred API if your Player implements it
+	if other.has_method("apply_knockback_external"):
+		other.call("apply_knockback_external", shared)
+		return
+
+	# Fallback
+	other.velocity += shared
+
+
+#-----------
 # DISTANCE + ROPE LINE (VISUAL)
 #-----------
 func _update_players_distance() -> void:
@@ -226,11 +279,10 @@ func _update_players_distance() -> void:
 
 
 func _update_rope_line() -> void:
-	# Only update points. Everything else is styled in the Line2D inspector.
-	line_2d.points = [
+	line_2d.points = PackedVector2Array([
 		line_2d.to_local(p_1_mindistance_marker_2d.global_position),
 		line_2d.to_local(p_2_mindistance_marker_2d.global_position)
-	]
+	])
 
 
 #-----------
@@ -314,7 +366,6 @@ func _update_rope_midair_by_height() -> void:
 	var p1_dangling: bool = player_1.get_rope_midair()
 	var p2_dangling: bool = player_2.get_rope_midair()
 
-	# Already dangling?
 	if p1_dangling or p2_dangling:
 		if p1_dangling and player_1.is_on_floor():
 			player_1.set_rope_midair(false)
@@ -371,7 +422,7 @@ func _cancel_apex_if_invalid() -> void:
 	var p1_dangling: bool = player_1.get_rope_midair()
 	var p2_dangling: bool = player_2.get_rope_midair()
 
-	var bob_still_dangling: bool
+	var bob_still_dangling: bool = false
 	if _apex_pending_bob_is_p1:
 		bob_still_dangling = p1_dangling
 	else:
@@ -399,9 +450,6 @@ func _is_valid_apex_geometry(r_hat: Vector2) -> bool:
 
 #-----------
 # SWING / CLIMB / APEX TIMER START
-#   While apex timer is running:
-#     - input is ignored (pump + climb disabled)
-#     - pendulum fall still happens, but gravity can be scaled and return-help disabled
 #-----------
 func _apply_arcade_swing_and_climb(delta: float) -> void:
 	var p1_is_dangling: bool = player_1.get_rope_midair()
@@ -413,10 +461,10 @@ func _apply_arcade_swing_and_climb(delta: float) -> void:
 		_p2_tangent_init = false
 		return
 
-	var anchor_marker: Marker2D
-	var bob_marker: Marker2D
-	var bob_player: CharacterBody2D
-	var bob_is_p1: bool
+	var anchor_marker: Marker2D = null
+	var bob_marker: Marker2D = null
+	var bob_player: CharacterBody2D = null
+	var bob_is_p1: bool = false
 
 	if p1_is_dangling:
 		bob_player = player_1
@@ -429,6 +477,9 @@ func _apply_arcade_swing_and_climb(delta: float) -> void:
 		anchor_marker = p_1_mindistance_marker_2d
 		bob_is_p1 = false
 
+	if bob_player == null or bob_marker == null or anchor_marker == null:
+		return
+
 	var anchor_pos: Vector2 = anchor_marker.global_position
 	var bob_pos: Vector2 = bob_marker.global_position
 
@@ -440,16 +491,13 @@ func _apply_arcade_swing_and_climb(delta: float) -> void:
 	var r_hat: Vector2 = r_vec / r_len
 	var tangent: Vector2 = Vector2(-r_hat.y, r_hat.x)
 
-	# Apex timer waiting?
 	var apex_waiting: bool = false
 	if _apex_pending:
 		apex_waiting = true
 	elif apex_timer != null and apex_timer.time_left > 0.0:
 		apex_waiting = true
 
-	# -------------------------
-	# CLIMB (disabled during apex timer if input lock is enabled)
-	# -------------------------
+	# CLIMB
 	var allow_climb: bool = rope_climb_enabled
 	if apex_waiting and disable_input_while_apex_timer_active:
 		allow_climb = false
@@ -478,24 +526,20 @@ func _apply_arcade_swing_and_climb(delta: float) -> void:
 			bob_player.velocity = vel_jump
 			return
 
-	# -------------------------
-	# Velocity source (hold during apex timer so player input can't override)
-	# -------------------------
-	var vel2: Vector2
+	# Velocity source
+	var vel2: Vector2 = bob_player.velocity
 	if apex_waiting and disable_input_while_apex_timer_active:
 		if not _apex_hold_active or _apex_hold_bob_is_p1 != bob_is_p1:
 			_apex_hold_active = true
 			_apex_hold_bob_is_p1 = bob_is_p1
 			_apex_hold_velocity = bob_player.velocity
 		vel2 = _apex_hold_velocity
-	else:
-		vel2 = bob_player.velocity
 
-	# Remove radial velocity (prevents stretch)
+	# Remove radial velocity
 	var radial_speed: float = vel2.dot(r_hat)
 	vel2 -= r_hat * radial_speed
 
-	# Pendulum accel (always allowed; scaled during apex wait if desired)
+	# Pendulum accel
 	var grav_scale: float = 1.0
 	if apex_waiting and disable_input_while_apex_timer_active:
 		grav_scale = apex_timer_swing_gravity_scale
@@ -513,7 +557,7 @@ func _apply_arcade_swing_and_climb(delta: float) -> void:
 
 	vel2 += tangent * tangential_accel * delta
 
-	# Pump (disabled during apex wait if input lock is enabled)
+	# Pump
 	var allow_pump: bool = swing_pump_enabled
 	if apex_waiting and disable_input_while_apex_timer_active:
 		allow_pump = false
@@ -553,13 +597,13 @@ func _apply_arcade_swing_and_climb(delta: float) -> void:
 		_apex_hold_bob_is_p1 = bob_is_p1
 		_apex_hold_velocity = vel2
 
-	# Snap dangling marker to current rope length
+	# Snap dangling marker
 	var desired_marker_pos: Vector2 = anchor_pos + (r_hat * _rope_current_length)
 	_set_player_pos_from_marker(bob_player, bob_marker, desired_marker_pos)
 
 
 #-----------
-# APEX TIMER START + SFX
+# APEX TIMER START + SFX (NO TERNARY)
 #-----------
 func _start_apex_timer_for_bob(bob_is_p1: bool, tangent_x_sign: float) -> void:
 	if apex_timer == null:
@@ -574,7 +618,6 @@ func _start_apex_timer_for_bob(bob_is_p1: bool, tangent_x_sign: float) -> void:
 	if _apex_pending_tangent_x_sign == 0.0:
 		_apex_pending_tangent_x_sign = 1.0
 
-	# initialise hold velocity at the moment the timer starts (locks out input)
 	if disable_input_while_apex_timer_active:
 		_apex_hold_active = true
 		_apex_hold_bob_is_p1 = bob_is_p1
@@ -597,32 +640,25 @@ func _start_apex_timer_for_bob(bob_is_p1: bool, tangent_x_sign: float) -> void:
 
 
 #-----------
-# APEX TIMER TIMEOUT -> EXECUTE JUMP + SFX
+# APEX TIMER TIMEOUT -> EXECUTE JUMP + SFX (NO TERNARY)
 #-----------
 func _on_apex_timer_timeout() -> void:
 	if not _apex_pending:
 		return
 
 	var bob_is_p1: bool = _apex_pending_bob_is_p1
-	var bob: CharacterBody2D = null
 
+	# Validate still dangling
 	if bob_is_p1:
-		bob = player_1
 		if not player_1.get_rope_midair():
 			_apex_pending = false
 			_apex_hold_active = false
 			return
 	else:
-		bob = player_2
 		if not player_2.get_rope_midair():
 			_apex_pending = false
 			_apex_hold_active = false
 			return
-
-	if bob == null:
-		_apex_pending = false
-		_apex_hold_active = false
-		return
 
 	_execute_apex_jump(bob_is_p1, _apex_pending_tangent_x_sign)
 	_apex_pending = false
@@ -632,13 +668,11 @@ func _on_apex_timer_timeout() -> void:
 
 
 func _execute_apex_jump(bob_is_p1: bool, tangent_x_sign: float) -> void:
-	# Release rope-midair so Player gravity resumes
 	if bob_is_p1:
 		player_1.set_rope_midair(false)
 	else:
 		player_2.set_rope_midair(false)
 
-	# SFX on jump
 	if apex_jump_sfx_enabled:
 		var bob_for_sfx: Node = null
 		if bob_is_p1:
@@ -649,7 +683,6 @@ func _execute_apex_jump(bob_is_p1: bool, tangent_x_sign: float) -> void:
 		if bob_for_sfx != null and bob_for_sfx.has_method("play_swing_apex_jump_sfx"):
 			bob_for_sfx.call_deferred("play_swing_apex_jump_sfx")
 
-	# Apply velocity
 	var bob: CharacterBody2D = null
 	if bob_is_p1:
 		bob = player_1
@@ -659,14 +692,12 @@ func _execute_apex_jump(bob_is_p1: bool, tangent_x_sign: float) -> void:
 	if bob == null:
 		return
 
-	# Start apex height clamp
 	if apex_jump_height_clamp_enabled:
 		_apex_clamp_active = true
 		_apex_clamp_is_p1 = bob_is_p1
 		_apex_clamp_start_y = bob.global_position.y
 		_apex_clamp_timer = maxf(apex_jump_clamp_duration, 0.0)
 
-	# Start tug advantage (wins tug-of-war until grounded)
 	_start_apex_tug_advantage(bob_is_p1)
 
 	var out_vel: Vector2 = bob.velocity
@@ -687,7 +718,7 @@ func _execute_apex_jump(bob_is_p1: bool, tangent_x_sign: float) -> void:
 
 
 #-----------
-# APEX JUMP HEIGHT CLAMP
+# APEX JUMP HEIGHT CLAMP (NO TERNARY)
 #-----------
 func _apply_apex_jump_height_clamp(delta: float) -> void:
 	if not apex_jump_height_clamp_enabled:
@@ -711,19 +742,16 @@ func _apply_apex_jump_height_clamp(delta: float) -> void:
 		_apex_clamp_active = false
 		return
 
-	# If bob is already falling (or not going up), stop clamping early
 	if bob.velocity.y >= 0.0:
 		_apex_clamp_active = false
 		return
 
-	# Cap the highest point (smaller Y = higher up)
 	var target_y: float = _apex_clamp_start_y - apex_jump_max_rise_px
 	if bob.global_position.y < target_y:
 		var gp: Vector2 = bob.global_position
 		gp.y = target_y
 		bob.global_position = gp
 
-		# Kill upward velocity so we don't keep shoving into the cap
 		var v: Vector2 = bob.velocity
 		if v.y < 0.0:
 			v.y = 0.0
@@ -731,7 +759,7 @@ func _apply_apex_jump_height_clamp(delta: float) -> void:
 
 
 #-----------
-# APEX DETECTION (tangential sign flip near slow speeds)
+# APEX DETECTION
 #-----------
 func _check_apex_tangent_flip(bob_is_p1: bool, tangent_speed: float) -> bool:
 	if absf(tangent_speed) > swing_apex_speed_threshold:
@@ -753,7 +781,6 @@ func _check_apex_tangent_flip(bob_is_p1: bool, tangent_speed: float) -> bool:
 		_p1_prev_tangent = tangent_speed
 		return (prev > 0.0 and tangent_speed < 0.0) or (prev < 0.0 and tangent_speed > 0.0)
 
-	# bob is p2
 	if not _p2_tangent_init:
 		_p2_tangent_init = true
 		_p2_prev_tangent = tangent_speed
@@ -792,8 +819,7 @@ func _get_bob_vertical_input(bob_is_p1: bool) -> float:
 
 
 #-----------
-# ROPE (TUG-OF-WAR FEEL) - MARKER-STRICT + LOCK SUPPORT
-#   Apex jumper "wins" tug-of-war until grounded again.
+# ROPE (TUG-OF-WAR FEEL)
 #-----------
 func _apply_tug_of_war_rope(delta: float) -> void:
 	var p1: Vector2 = p_1_mindistance_marker_2d.global_position
@@ -813,7 +839,6 @@ func _apply_tug_of_war_rope(delta: float) -> void:
 	var share1: float = 0.5
 	var share2: float = 0.5
 
-	# Hard overrides first: movement lock
 	if p1_locked and not p2_locked:
 		share1 = 0.0
 		share2 = 1.0
@@ -821,7 +846,6 @@ func _apply_tug_of_war_rope(delta: float) -> void:
 		share1 = 1.0
 		share2 = 0.0
 	else:
-		# Normal weighting / brace bias
 		var w1: float = 1.0
 		var w2: float = 1.0
 
@@ -852,19 +876,15 @@ func _apply_tug_of_war_rope(delta: float) -> void:
 		share1 = inv1 / inv_sum
 		share2 = inv2 / inv_sum
 
-	# Apex tug advantage override (unless someone is movement-locked)
 	if _apex_tug_adv_active and (not p1_locked) and (not p2_locked):
 		var s: float = clampf(apex_tug_win_strength, 0.0, 1.0)
 		if _apex_tug_adv_is_p1:
-			# P1 wins => P2 takes more correction
 			share1 = share1 * (1.0 - s)
 			share2 = 1.0 - share1
 		else:
-			# P2 wins => P1 takes more correction
 			share2 = share2 * (1.0 - s)
 			share1 = 1.0 - share2
 
-	# Hard clamp
 	if hard_rope_enabled and dist > (max_travel_distance + hard_rope_slack):
 		var hard_excess: float = dist - max_travel_distance
 		var snap: float = minf(hard_excess, hard_rope_max_snap)
@@ -876,7 +896,6 @@ func _apply_tug_of_war_rope(delta: float) -> void:
 			var p2_target: Vector2 = p2 - dir * (snap * share2)
 			_set_player_pos_from_marker(player_2, p_2_mindistance_marker_2d, p2_target)
 
-		# Recompute after clamp
 		p1 = p_1_mindistance_marker_2d.global_position
 		p2 = p_2_mindistance_marker_2d.global_position
 		delta_vec = p2 - p1
@@ -887,7 +906,6 @@ func _apply_tug_of_war_rope(delta: float) -> void:
 		dir = delta_vec / dist
 		excess = dist - max_travel_distance
 
-	# Soft spring correction
 	var desired_step: float = excess * rope_strength * delta
 	var step: float = minf(desired_step, max_position_correction)
 
@@ -898,7 +916,6 @@ func _apply_tug_of_war_rope(delta: float) -> void:
 		var p2_marker_target: Vector2 = p2 - dir * (step * share2)
 		_set_player_pos_from_marker(player_2, p_2_mindistance_marker_2d, p2_marker_target)
 
-	# Velocity correction
 	var v1: Vector2 = player_1.velocity
 	var v2: Vector2 = player_2.velocity
 	var rel_speed_along: float = (v2 - v1).dot(dir)
@@ -912,7 +929,6 @@ func _apply_tug_of_war_rope(delta: float) -> void:
 	if share2 > 0.0:
 		player_2.velocity -= correction_vel * share2
 
-	# Perpendicular damping
 	if perpendicular_damping > 0.0:
 		var perp: Vector2 = Vector2(-dir.y, dir.x)
 

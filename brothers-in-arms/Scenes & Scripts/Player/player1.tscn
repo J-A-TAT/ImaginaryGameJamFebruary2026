@@ -1,4 +1,4 @@
-[gd_scene load_steps=56 format=3 uid="uid://giax34qinv16"]
+[gd_scene load_steps=57 format=3 uid="uid://giax34qinv16"]
 
 [ext_resource type="Script" uid="uid://c1820xwki61j6" path="res://Scenes & Scripts/Player/player_1.gd" id="1_v7ndh"]
 [ext_resource type="Texture2D" uid="uid://0h0y58muxn78" path="res://Assets/Artwork/Characters/Player 1/Animation/Run-Walk/Run/Player 1 Run_20260220211337.png" id="2_2mmf7"]
@@ -38,6 +38,7 @@
 [ext_resource type="Texture2D" uid="uid://do7m8xc07417j" path="res://Assets/Artwork/Characters/Player 1/Animation/Anchor/Player 1 Anchor_20260221104219.png" id="35_4sc60"]
 [ext_resource type="Texture2D" uid="uid://i4o2ah11k5s3" path="res://Assets/Artwork/Characters/Player 1/Animation/Anchor/Player 1 Anchor_20260221104221.png" id="36_nb06d"]
 [ext_resource type="Script" uid="uid://dheiqti35l7ce" path="res://Scenes & Scripts/Modular/randomise_sound_player_2D.gd" id="38_4sc60"]
+[ext_resource type="Texture2D" uid="uid://bny5iobcsg2et" path="res://Assets/Artwork/Other/Door and Key/Key.png" id="38_4vsu7"]
 [ext_resource type="Script" uid="uid://dq877u0o56exf" path="res://Scenes & Scripts/Modular/randomise_pitch.gd" id="38_adisg"]
 [ext_resource type="AudioStream" uid="uid://b8o7ecrjjq81r" path="res://Assets/Sound/SFX/PlayerVoice/P1_SFX_1.mp3" id="39_bcalx"]
 [ext_resource type="AudioStream" uid="uid://508s48g2c4df" path="res://Assets/Sound/SFX/PlayerVoice/P1_SFX_2.mp3" id="41_1cqhe"]
@@ -303,6 +304,13 @@ sprite_frames = SubResource("SpriteFrames_uie26")
 frame = 4
 frame_progress = 1.0
 
+[node name="KeyArtwork" type="Node2D" parent="Artwork/Sprites"]
+
+[node name="Sprite2D" type="Sprite2D" parent="Artwork/Sprites/KeyArtwork"]
+position = Vector2(-1.0000002, -35.00001)
+scale = Vector2(0.56249994, 0.56249994)
+texture = ExtResource("38_4vsu7")
+
 [node name="Gameplay" type="Node2D" parent="."]
 
 [node name="Animations" type="Node2D" parent="Gameplay"]
@@ -311,6 +319,10 @@ frame_progress = 1.0
 
 [node name="CayoteTimer" type="Timer" parent="Gameplay/Timers"]
 wait_time = 0.5
+one_shot = true
+
+[node name="AnchorCooldownTimer" type="Timer" parent="Gameplay/Timers"]
+wait_time = 0.1
 one_shot = true
 
 [node name="PhysicsDetection" type="Node2D" parent="Gameplay"]
