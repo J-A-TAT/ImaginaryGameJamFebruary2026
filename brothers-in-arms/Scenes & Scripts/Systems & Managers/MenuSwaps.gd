@@ -10,6 +10,17 @@ extends CanvasLayer
 @onready var credits_screen = $"Control/Credits"
 @onready var base_background = $"UIBackground"
 
+@onready var StartGame = $"StartGame"
+@onready var HowToPlay = $"HowToPlay"
+@onready var GoToCredits = $"GoToCredits"
+@onready var ResumeGameFromPause = $"ResumeGameFromPause"
+@onready var BackToTitleFromPause = $"BackToTitleFromPause"
+@onready var ResumeGameFromTutorial = $"ResumeGameFromTutorial"
+@onready var BackToTitleFromTutorial = $"BackToTitleFromTutorial"
+@onready var ResumeGameFromCredits = $"ResumeGameFromCredits"
+@onready var BackToTitleFromCredits = $"BackToTitleFromCredits"
+@onready var NextFrame = $"NextFrame"
+
 # cinematic_frames to store all of the path files for the story frames.
 var cinematic_frames = [
 	#TODO Replace with all path files to each of the cutscenes
