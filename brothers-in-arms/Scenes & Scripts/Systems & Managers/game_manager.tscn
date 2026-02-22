@@ -1,0 +1,80 @@
+[gd_scene format=3 uid="uid://bg8ljpj12rt3k"]
+
+[ext_resource type="PackedScene" uid="uid://i4j7g6habyp0" path="res://Colour Pallete/colour_pallete.tscn" id="1_avxtu"]
+[ext_resource type="PackedScene" uid="uid://c6gg38kc1lp7w" path="res://Scenes & Scripts/Environment/ground.tscn" id="1_jnjht"]
+[ext_resource type="PackedScene" uid="uid://giax34qinv16" path="res://Scenes & Scripts/Player/player1.tscn" id="2_v6nlk"]
+[ext_resource type="PackedScene" uid="uid://cpu4tlsx84nis" path="res://Scenes & Scripts/Player/player2.tscn" id="3_8b7eh"]
+[ext_resource type="PackedScene" uid="uid://nvpenbawj2jq" path="res://Scenes & Scripts/Environment/platform.tscn" id="5_8b7eh"]
+[ext_resource type="Script" uid="uid://c6q6vaqhxkrmr" path="res://Scenes & Scripts/Environment/movingPlatform.gd" id="6_ao8b3"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_k8dbw"]
+
+[node name="game_manager" type="Node2D" unique_id=1575948053]
+
+[node name="Game" type="Node2D" parent="." unique_id=193478419]
+
+[node name="Gameplay" type="Node2D" parent="Game" unique_id=497733317]
+position = Vector2(640, 360)
+
+[node name="Markers" type="Node2D" parent="Game/Gameplay" unique_id=346177569]
+position = Vector2(-640, -360)
+
+[node name="Camera" type="Node2D" parent="Game/Gameplay" unique_id=1866023195]
+
+[node name="PlayerTrackingCamera2D" type="Camera2D" parent="Game/Gameplay/Camera" unique_id=141622893]
+
+[node name="Timers" type="Node2D" parent="Game/Gameplay" unique_id=1034060834]
+
+[node name="Modular Systems" type="Node2D" parent="Game/Gameplay" unique_id=1915655551]
+
+[node name="ColourPallete" parent="Game/Gameplay" unique_id=816006261 instance=ExtResource("1_avxtu")]
+position = Vector2(-888, -360)
+
+[node name="Players (Temp)" type="Node2D" parent="Game/Gameplay" unique_id=255595278]
+
+[node name="Player1" parent="Game/Gameplay/Players (Temp)" unique_id=1899584480 instance=ExtResource("2_v6nlk")]
+position = Vector2(48, 248)
+
+[node name="Player2" parent="Game/Gameplay/Players (Temp)" unique_id=1692320864 instance=ExtResource("3_8b7eh")]
+position = Vector2(-24, 248)
+
+[node name="Level" type="Node2D" parent="Game" unique_id=953370764]
+position = Vector2(640, 360)
+
+[node name="Floor1" type="Node2D" parent="Game/Level" unique_id=244080563]
+position = Vector2(0, 360)
+
+[node name="Ground" parent="Game/Level/Floor1" unique_id=424815124 instance=ExtResource("1_jnjht")]
+modulate = Color(0.57254905, 0.4392157, 0.24313726, 1)
+scale = Vector2(16, 1)
+
+[node name="Ground2" parent="Game/Level/Floor1" unique_id=563761753 instance=ExtResource("1_jnjht")]
+modulate = Color(0.57254905, 0.4392157, 0.24313726, 1)
+position = Vector2(648, -184)
+scale = Vector2(8, 0.5)
+
+[node name="Ground3" parent="Game/Level/Floor1" unique_id=993527695 instance=ExtResource("1_jnjht")]
+modulate = Color(0.57254905, 0.4392157, 0.24313726, 1)
+position = Vector2(-704, -328)
+scale = Vector2(8, 0.5)
+
+[node name="Ground4" parent="Game/Level/Floor1" unique_id=796206484 instance=ExtResource("1_jnjht")]
+modulate = Color(0.57254905, 0.4392157, 0.24313726, 1)
+position = Vector2(-280, -472)
+scale = Vector2(8, 0.5)
+
+[node name="platform" parent="Game/Level/Floor1" unique_id=179993350 instance=ExtResource("5_8b7eh")]
+modulate = Color(1, 0.5882353, 0.105882354, 1)
+position = Vector2(-32, -184)
+
+[node name="platform2" parent="Game/Level/Floor1" unique_id=2046116613 instance=ExtResource("5_8b7eh")]
+modulate = Color(1, 0.5882353, 0.105882354, 1)
+position = Vector2(-32, -296)
+
+[node name="AnimatableBody2D" type="AnimatableBody2D" parent="Game/Level/Floor1" unique_id=860084830]
+script = ExtResource("6_ao8b3")
+
+[node name="Sprite2D" type="Sprite2D" parent="Game/Level/Floor1/AnimatableBody2D" unique_id=1316873891]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Game/Level/Floor1/AnimatableBody2D" unique_id=1311318721]
+shape = SubResource("RectangleShape2D_k8dbw")
