@@ -6,6 +6,15 @@
 [ext_resource type="PackedScene" uid="uid://cpu4tlsx84nis" path="res://Scenes & Scripts/Player/player2.tscn" id="3_8b7eh"]
 [ext_resource type="PackedScene" uid="uid://nvpenbawj2jq" path="res://Scenes & Scripts/Environment/platform.tscn" id="5_8b7eh"]
 [ext_resource type="Script" uid="uid://c6q6vaqhxkrmr" path="res://Scenes & Scripts/Environment/movingPlatform.gd" id="6_ao8b3"]
+[gd_scene load_steps=8 format=3 uid="uid://dvo1e77gr8k3"]
+
+[ext_resource type="PackedScene" uid="uid://i4j7g6habyp0" path="res://Colour Pallete/colour_pallete.tscn" id="1_avxtu"]
+[ext_resource type="PackedScene" uid="uid://c6gg38kc1lp7w" path="res://Scenes & Scripts/Environment/ground.tscn" id="1_jnjht"]
+[ext_resource type="PackedScene" uid="uid://clj5cr27uhuck" path="res://Scenes & Scripts/Player/character_manager.tscn" id="1_v6nlk"]
+[ext_resource type="PackedScene" uid="uid://bx87c3opkpe5i" path="res://Scenes & Scripts/hazards/hazard.tscn" id="3_8b7eh"]
+[ext_resource type="PackedScene" uid="uid://shl5vrmfjipi" path="res://Scenes & Scripts/KeyDoor/key.tscn" id="4_ao8b3"]
+[ext_resource type="PackedScene" uid="uid://cnvy3d23oj2u8" path="res://Scenes & Scripts/Environment/swinging_platform.tscn" id="5_8b7eh"]
+[ext_resource type="PackedScene" uid="uid://byi5opx138wkw" path="res://Scenes & Scripts/KeyDoor/door.tscn" id="5_k8dbw"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_k8dbw"]
 
@@ -17,6 +26,10 @@
 position = Vector2(640, 360)
 
 [node name="Markers" type="Node2D" parent="Game/Gameplay" unique_id=346177569]
+[node name="CharacterManager" parent="Game/Gameplay" instance=ExtResource("1_v6nlk")]
+position = Vector2(0, 240)
+
+[node name="Markers" type="Node2D" parent="Game/Gameplay"]
 position = Vector2(-640, -360)
 
 [node name="Camera" type="Node2D" parent="Game/Gameplay" unique_id=1866023195]
@@ -24,6 +37,7 @@ position = Vector2(-640, -360)
 [node name="PlayerTrackingCamera2D" type="Camera2D" parent="Game/Gameplay/Camera" unique_id=141622893]
 
 [node name="Timers" type="Node2D" parent="Game/Gameplay" unique_id=1034060834]
+[node name="Timers" type="Node2D" parent="Game/Gameplay"]
 
 [node name="Modular Systems" type="Node2D" parent="Game/Gameplay" unique_id=1915655551]
 
@@ -37,6 +51,14 @@ position = Vector2(48, 248)
 
 [node name="Player2" parent="Game/Gameplay/Players (Temp)" unique_id=1692320864 instance=ExtResource("3_8b7eh")]
 position = Vector2(-24, 248)
+[node name="Hazard" parent="Game/Gameplay" instance=ExtResource("3_8b7eh")]
+position = Vector2(238, 44)
+
+[node name="Key" parent="Game/Gameplay" instance=ExtResource("4_ao8b3")]
+position = Vector2(108, 145)
+
+[node name="Door" parent="Game/Gameplay" instance=ExtResource("5_k8dbw")]
+position = Vector2(287, 263)
 
 [node name="Level" type="Node2D" parent="Game" unique_id=953370764]
 position = Vector2(640, 360)
@@ -51,16 +73,18 @@ scale = Vector2(16, 1)
 [node name="Ground2" parent="Game/Level/Floor1" unique_id=563761753 instance=ExtResource("1_jnjht")]
 modulate = Color(0.57254905, 0.4392157, 0.24313726, 1)
 position = Vector2(648, -184)
-scale = Vector2(8, 0.5)
+scale = Vector2(8, 0.2)
 
 [node name="Ground3" parent="Game/Level/Floor1" unique_id=993527695 instance=ExtResource("1_jnjht")]
+[node name="Ground5" parent="Game/Level/Floor1" instance=ExtResource("1_jnjht")]
 modulate = Color(0.57254905, 0.4392157, 0.24313726, 1)
-position = Vector2(-704, -328)
-scale = Vector2(8, 0.5)
+position = Vector2(176, -208)
+scale = Vector2(0.23999023, 0.2)
 
 [node name="Ground4" parent="Game/Level/Floor1" unique_id=796206484 instance=ExtResource("1_jnjht")]
 modulate = Color(0.57254905, 0.4392157, 0.24313726, 1)
-position = Vector2(-280, -472)
+position = Vector2(8, -956)
+rotation = 1.5707964
 scale = Vector2(8, 0.5)
 
 [node name="platform" parent="Game/Level/Floor1" unique_id=179993350 instance=ExtResource("5_8b7eh")]
@@ -78,3 +102,10 @@ script = ExtResource("6_ao8b3")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Game/Level/Floor1/AnimatableBody2D" unique_id=1311318721]
 shape = SubResource("RectangleShape2D_k8dbw")
+[node name="Ground3" parent="Game/Level/Floor1" instance=ExtResource("1_jnjht")]
+modulate = Color(0.57254905, 0.4392157, 0.24313726, 1)
+position = Vector2(-704, -328)
+scale = Vector2(8, 0.5)
+
+[node name="Swinging_Platform" parent="." instance=ExtResource("5_8b7eh")]
+position = Vector2(649, 248)

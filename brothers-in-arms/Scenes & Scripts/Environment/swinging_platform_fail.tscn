@@ -1,0 +1,55 @@
+[gd_scene load_steps=7 format=3 uid="uid://d4gpikfr1n1nt"]
+
+[ext_resource type="Texture2D" uid="uid://elatv6kbr688" path="res://Assets/Artwork/DevArt/Environment_0003_Circle.png" id="1_aitc7"]
+[ext_resource type="Script" uid="uid://bgaprqa4ah7ul" path="res://Scenes & Scripts/Environment/swinging_platform_fail.gd" id="1_tae8c"]
+[ext_resource type="PackedScene" uid="uid://i4j7g6habyp0" path="res://Colour Pallete/colour_pallete.tscn" id="2_lg2o8"]
+[ext_resource type="Texture2D" uid="uid://cn7oyjas1hylu" path="res://Assets/Artwork/DevArt/Environment_0005_PlatformRounded.png" id="3_b4xp6"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_lg2o8"]
+radius = 33.06055
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_b4xp6"]
+size = Vector2(126, 20)
+
+[node name="swinging_platform" type="Node2D"]
+script = ExtResource("1_tae8c")
+
+[node name="ColourPallete" parent="." instance=ExtResource("2_lg2o8")]
+visible = false
+position = Vector2(229, -38)
+
+[node name="AnchorStaticBody2D" type="StaticBody2D" parent="."]
+collision_layer = 4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AnchorStaticBody2D"]
+modulate = Color(0.5411765, 0.5411765, 0.5411765, 1)
+shape = SubResource("CircleShape2D_lg2o8")
+
+[node name="Sprite2D" type="Sprite2D" parent="AnchorStaticBody2D"]
+modulate = Color(0.5411765, 0.5411765, 0.5411765, 1)
+texture = ExtResource("1_aitc7")
+
+[node name="RopeStartMarker2D" type="Marker2D" parent="AnchorStaticBody2D"]
+
+[node name="PlatformRigidBody2D" type="RigidBody2D" parent="."]
+position = Vector2(0, 272)
+collision_layer = 16
+linear_velocity = Vector2(50, 0)
+
+[node name="Sprite2D" type="Sprite2D" parent="PlatformRigidBody2D"]
+modulate = Color(1, 0.5882353, 0.105882354, 1)
+texture = ExtResource("3_b4xp6")
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="PlatformRigidBody2D"]
+shape = SubResource("RectangleShape2D_b4xp6")
+one_way_collision = true
+one_way_collision_margin = 4.0
+
+[node name="RopeEndMarker2D" type="Marker2D" parent="PlatformRigidBody2D"]
+
+[node name="PinJoint2D" type="PinJoint2D" parent="."]
+node_a = NodePath("../AnchorStaticBody2D")
+node_b = NodePath("../PlatformRigidBody2D")
+
+[node name="Line2D" type="Line2D" parent="."]
+default_color = Color(1, 0.6745098, 0.29411766, 1)
